@@ -18,3 +18,14 @@ button:hover{
     cursor: pointer;
     border: 2px solid white;
 }
+
+.author-div{
+    background-color: rgb(64, 185, 218);
+    padding: 20px;
+    margin:20px;
+}
+
+.author-div img{
+    border: 3px solid black;
+    border-radius: 20px;
+}

@@ -13,5 +13,19 @@
         </ul>
     </nav>
     <h1><%= message %></h1>
+    <% if(userRole != "admin"){ %>
+        <% userblogs.blogs.forEach((ele, ind) => { %>
+            <div class="author-div">
+                <br>
+                <br>
+                <img src="<%= ele.filepath %>" alt="Thumbnail image">
+                <h1><%= ele.title %></h1>
+                <p><%= ele.content %></p>
+                <br>
+                <a href="/updatepost/<%= ind %> "><button>Update Post</button></a>
+                <br>
+            </div>
+        <% }) %>
+    <% } %>
 </body>
 </html>

@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const session = require("express-session");
 const mongodb = require("mongodb");
+const multer = require("multer");
+
+
+
 
 app.use(session({
     secret:"abc@123",
@@ -12,7 +16,21 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/uploads"));
 app.set("view engine","ejs");
+
+
+const storage = multer.diskStorage({
+    destination:(req, file, cb) => {
+        cb(null,"uploads/");
+    },
+    filename:(req, file, cb) => {
+        cb(null,`${Date.now()}-${file.originalname}`);
+    }
+});
+
+const upload = multer({storage});
+
 
 let dbinstance;
 const client = mongodb.MongoClient;
@@ -108,7 +126,23 @@ app.post("/signin", (req, res) => {
 
 app.get("/home", authentication, (req,res) => {
     console.log(req.session.userData);
-    res.render("home",{message:`Welcome ${req.session.userData.name}`});
+    const userRole = req.session.userData.role;
+    if(req.session.userData.role == "admin"){
+        dbinstance.collection("blogs").find({}).toArray().then((data) => {
+            console.log("Data sent for admin...");
+            res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,userRole});
+        }).catch((err) => {
+            console.error("Error in sending data for admin : ",err);
+        })
+    }else{
+        const username = req.session.userData.username;
+        dbinstance.collection("blogs").findOne({username}).then((data) => {
+            console.log("Data sent for user...");
+            res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,userRole});
+        }).catch((err) => {
+            console.error("Error in sending data for author");
+        })
+    }
 })
 
 app.get("/",(req,res) => {
@@ -116,7 +150,25 @@ app.get("/",(req,res) => {
     res.send("<h1>This is a trial webpage</h1>");
 })
 
+app.get("/createpost", authentication, (req, res) => {
+    res.render("createPost");
+})
 
+app.post("/createpost", upload.single("thumbnail"), (req, res) => {
+    const { title, content } = req.body;
+    const filepath = req.file.filename;
+    const uname = req.session.userData.username;
+    const newBlog = {
+        title, content, filepath, created_at:new Date()
+    };
+    dbinstance.collection("blogs").updateOne({username:uname}, {$push : { blogs : newBlog }}).then((data) => {
+        console.log("Blog post created and added to the user's blogs array.");
+        res.redirect("/home");
+    }).catch((err) => {
+        console.log("Error updating user document with new blog post: ", err);
+    });
+
+})
 
 app.listen(5000, (err) => {
     if(err){
