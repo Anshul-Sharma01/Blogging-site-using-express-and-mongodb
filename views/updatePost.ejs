@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update-Post</title>
+</head>
+<body>
+    <fieldset>
+        <legend>Update Post</legend>
+        <form action="" method="POST" enctype="multipart/form-data">
+            
+            <br>
+            <br>
+            <label for="tle">Title : </label>
+            <input type="text" name="title" id="tle" value="<%= data.title %>">
+            <br>
+            <br>
+            <label for="cntnt">Content : </label>
+            <textarea name="content" id="cntnt" rows="20" cols="50"><%= data.content %></textarea>
+            <br>
+            <br>
+            <label for="pimg">Previous thumbnail : </label>
+            <img src="/<%= data.filename %>" alt="Previous thumbnail" border="2px solid black"  height="200px">
+            <br>
+            <br>
+            <label for="pic">Change-Thumbnail : </label>
+            <input type="file" id="pic" name="thumbnail">
+            
+            <br>
+            <br>
+            <button type="submit">Submit</button>
+            <br>
+            <br>
+        </form>
+    </fieldset>
+</body>
+</html>

@@ -1,31 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="stylesheet" href="home.css">
 </head>
+
 <body>
     <nav>
         <ul>
             <li><a href="/createpost"><button>Create Post</button></a></li>
+            <li><a href="/updateinfo"><button>Update Info</button></a></li>
+            <li><a href="/logout"><button>LogOut</button></a></li>
         </ul>
     </nav>
     <h1><%= message %></h1>
-    <% if(userRole != "admin"){ %>
-        <% userblogs.blogs.forEach((ele, ind) => { %>
-            <div class="author-div">
-                <br>
-                <br>
-                <img src="<%= ele.filepath %>" alt="Thumbnail image">
-                <h1><%= ele.title %></h1>
-                <p><%= ele.content %></p>
-                <br>
-                <a href="/updatepost/<%= ind %> "><button>Update Post</button></a>
-                <br>
-            </div>
-        <% }) %>
-    <% } %>
+
+    <% if (userRole != "admin") { %>
+            <% userblogs.blogs.forEach((blog, index) => { %>
+                <div class="author-div">
+                    <img src="/<%= blog.filename %>" alt="Thumbnail" height="300px">
+                    <h1><%= blog.title %></h1>
+                    <p><%= blog.content %></p>
+                    <a href="/updatepost/<%= index %>"><button>Update Post</button></a>
+                </div>
+            <% }) %>
+        <% } %>
+
 </body>
+
 </html>
