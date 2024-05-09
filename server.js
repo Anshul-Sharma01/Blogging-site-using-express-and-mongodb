@@ -130,31 +130,34 @@ app.post("/signin", (req, res) => {
 // home
 
 
-// app.get("/home", authentication, (req, res) => {
-//     const userRole = req.session.userData.role;
-//     const username = req.session.userData.username;
-
-//     if (userRole == "author") {
-//         dbinstance.collection("blogs").findOne({ username: username }).then((userblogs) => {
-//             if (!userblogs || !userblogs.blogs) {
-//                 // Handle case when user has no blogs
-//                 res.render("home", { message: `Welcome ${req.session.userData.name}`, userblogs: null, userRole });
-//             } else {
-//                 // User has blogs
-//                 res.render("home", { message: `Welcome ${req.session.userData.name}`, userblogs: userblogs, userRole });
-//             }
-//         }).catch((err) => {
-//             console.error("Error in sending data for author: ", err);
-//         });
-//     } else if (userRole == "admin") {
-//         // Admin fetching all blogs
-//         dbinstance.collection("blogs").find({}).toArray().then((allBlogs) => {
-//             res.render("home", { message: `Welcome ${req.session.userData.name}`, userblogs: { blogs: allBlogs }, userRole });
-//         }).catch((err) => {
-//             console.error("Error in sending data for admin: ", err);
-//         });
-//     }
-// });
+app.get("/home", authentication, (req, res) =>{
+    const { username, role } = req.session.userData;
+    if(role != "admin"){
+        dbinstance.collection("blogs").findOne({ username, role }).then((data) => {
+            if(data){
+                console.log("user data found and sent to home.ejs for rendering...");
+                res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,dataExists:true,userRole:role});
+            }else{
+                console.log("Data doesn't exists for the current user...");
+                res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,dataExists:false,userRole:role});
+            }
+        }).catch((err) => {
+            console.log("Error in fetching blogs data for rendering... : ",err);
+        })
+    }else{
+        dbinstance.collection("blogs").find({}).toArray().then((data) => {
+            if(data){
+                console.log("All data fetched for admin to render...");
+                res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,dataExists:true,userRole:role});
+            }else{
+                console.log("No data exists to show for admin..");
+                res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,dataExists:false,userRole:role});
+            }
+        }).catch((err) => {
+            console.log("Error in fetching data for the admin to render...",err);
+        })
+    }
+})
 
 
 app.get("/",(req,res) => {
@@ -334,6 +337,40 @@ app.post("/updateinfo", (req, res) => {
         res.redirect("/home");
     }).catch((err) => {
         console.log("Error in updating the user in the blogs db");
+        res.redirect("/home");
+    })
+})
+
+
+// Delete Post
+
+app.get("/deletepost/:blogId/:username", (req, res) => {
+    const blogind = req.params.blogId;
+    const username = req.params.username;
+    dbinstance.collection("blogs").findOne({username}).then((data) => {
+        if(data){
+            const filepath = "./uploads/" + data.blogs[blogind].filename;
+            fs.unlink(filepath, (err) => {
+                if (err) {
+                    console.error("Error deleting previous photo:", err);
+                } else {
+                    console.log("Previous photo deleted successfully.");
+                }
+            });
+            const blogtoDelete = data.blogs[blogind];
+            dbinstance.collection("blogs").updateOne({username},{$pull:{blogs:blogtoDelete}}).then((data) => {
+                console.log("Blog successfully deleted...");
+                res.redirect("/home");
+            }).catch((err) => {
+                console.log("Error in deleting the blog : ",err);
+                res.redirect("/home");
+            })
+        }else{
+            console.log("User blogs not found..");
+            res.redirect("/home");
+        }
+    }).catch((err) => {
+        console.log("Error in finding the user blogs..");
         res.redirect("/home");
     })
 })

@@ -20,6 +20,7 @@
     <h1><%= message %></h1>
 
     <% if (userRole != "admin") { %>
+        <% if(dataExists){ %>
             <% userblogs.blogs.forEach((blog, index) => { %>
                 <div class="author-div">
                     <img src="/<%= blog.filename %>" alt="Thumbnail" height="300px">
@@ -28,7 +29,31 @@
                     <a href="/updatepost/<%= index %>"><button>Update Post</button></a>
                 </div>
             <% }) %>
+        <% }else{ %>
+            <p>You don't have any blogs yet!!!</p>
+        <% } %>        
+    <% }else{ %>
+        <% if(dataExists){ %>
+            <div class="username-div">
+                <% userblogs.forEach((ele) => { %>
+                    <h2>Username : <%= ele.username %></h2>
+
+                    <% ele.blogs.forEach((el,ind) => { %>
+                        <div class="author-div">
+                            <img src="/<%= el.filename %>" alt="Thumbnail" height="300px" >
+                            <h1><%= el.title %></h1>
+                            <p><%= el.content %></p>
+                            <a href="/deletepost/<%= ind %>/<%= ele.username %>"><button>Delete Post</button></a>
+                        </div>
+                    <% }) %>
+                    <br>
+                    <br>
+                <% }) %>
+            </div>
+        <% }else{ %>
+            <p>Hello Admin !! Sorry to say but no user have created their blogs yet !!</p>
         <% } %>
+    <% } %>
 
 </body>
 
