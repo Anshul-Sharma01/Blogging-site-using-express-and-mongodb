@@ -44,6 +44,9 @@
                             <h1><%= el.title %></h1>
                             <p><%= el.content %></p>
                             <a href="/deletepost/<%= ind %>/<%= ele.username %>"><button>Delete Post</button></a>
+                            <% if(ele.username == username){ %>
+                                <a href="/updatepost/<%= ind %>"><button>Update Post</button></a>
+                            <% } %>
                         </div>
                     <% }) %>
                     <br>

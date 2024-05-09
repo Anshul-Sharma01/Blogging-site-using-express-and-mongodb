@@ -134,7 +134,7 @@ app.get("/home", authentication, (req, res) =>{
     const { username, role } = req.session.userData;
     if(role != "admin"){
         dbinstance.collection("blogs").findOne({ username, role }).then((data) => {
-            if(data){
+            if(data && data.blogs.length > 0){
                 console.log("user data found and sent to home.ejs for rendering...");
                 res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,dataExists:true,userRole:role});
             }else{
@@ -148,7 +148,7 @@ app.get("/home", authentication, (req, res) =>{
         dbinstance.collection("blogs").find({}).toArray().then((data) => {
             if(data){
                 console.log("All data fetched for admin to render...");
-                res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,dataExists:true,userRole:role});
+                res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,dataExists:true,userRole:role,username});
             }else{
                 console.log("No data exists to show for admin..");
                 res.render("home",{message:`Welcome ${req.session.userData.name}`,userblogs:data,dataExists:false,userRole:role});
